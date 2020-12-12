@@ -1,0 +1,16 @@
+- name: Create user if not present
+  user:
+    name: "{{ account.username }}"
+    password: "{{ account.userpass }}"
+    home: "{{ account.home }}"
+    group: "{{ account.username }}"
+    groups:
+        - sudo
+
+- name: Create filesystem skeleton
+  file:
+    path: "{{ account.home }}/{{ item.path }}"
+    state: directory
+    mode: '{{ item.mode }}'
+  with_community.general.filetree: filesystem_skeleton/
+  when: item.state == 'directory'

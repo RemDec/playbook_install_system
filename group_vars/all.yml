@@ -1,0 +1,7 @@
+tree:
+    trash: '$HOME/Trash'
+    debscr: '$HOME/Sources/DebianPackages'
+account:
+    username: 'remdec'
+    home: '/home/remdec'
+    userpass: '$6$8lp9e5Y3BouLjAn5$sMhPY1CX6PuI5MmFoLpz2B.1f9xE3xmDiy4MHevDLWttt4hcgM6BGkus/TXULdnF0rZrjVIAQUH7I0zYhVHIs.'
