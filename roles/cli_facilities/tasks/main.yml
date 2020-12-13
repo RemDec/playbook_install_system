@@ -1,0 +1,4 @@
+- name: Create bash_aliases file in home directory
+  template:
+    src: bash_aliases.j2
+    dst: {{ account.home }}/.bash_aliases

@@ -1,6 +1,12 @@
 tree:
-    trash: '$HOME/Trash'
-    debscr: '$HOME/Sources/DebianPackages'
+  backups: 'Backups'
+  documents: 'Documents' 
+  images: 'Images' 
+  music: 'Music' 
+  repositories: 'Repositories'
+  scripts: 'Scripts'
+  sources: 'Sources'
+  trash: 'Trash'
 account:
     username: 'remdec'
     home: '/home/remdec'
