@@ -2,3 +2,10 @@
   template:
     src: bash_aliases.j2
     dest: "{{ account.home }}/.bash_aliases"
+
+- name: Git configuration
+  community.general.git_config:
+    name: "{{ item.name }}"
+    scope: "{{ item.scope | default('global') }}"
+    value: "{{ item.value }}"
+  with_items: "{{ git_config }}"
