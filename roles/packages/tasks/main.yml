@@ -1,0 +1,19 @@
+- name: Install minimal packages
+  ansible.builtin.package:
+    name: "{{ pkgs_minimal }}"
+    state: latest
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Install common packages
+  ansible.builtin.package:
+    name: "{{ pkgs_common }}"
+    state: latest
+  when: pkgs.install_common
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Install security related packages
+  ansible.builtin.package:
+    name: "{{ pkgs_security }}"
+    state: latest
+  when: pkgs.install_security
+  ignore_errors: "{{ ansible_check_mode }}"

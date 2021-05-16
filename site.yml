@@ -1,3 +1,5 @@
 - hosts: target
   roles:
-    - linux_setup
+    - system_setup    # create account, file hierarchy, etc.
+    - packages        # install required base packages
+    - cli_facilities  # aliases, bin symbolic links, etc.

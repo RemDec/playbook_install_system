@@ -1,0 +1,20 @@
+pkgs_minimal:
+  - tree
+  - htop
+  - net-tools
+  - url
+  - snapd
+  - terminator
+  - vim
+  - git
+
+pkgs_common:
+  - firefox
+  - ksnip
+  - inkscape
+  - gimp
+
+pkgs_security:
+  - security
+  - virtualbox
+  - nmap

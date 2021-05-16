@@ -1,13 +1,19 @@
 tree:
-  backups: 'Backups'
-  documents: 'Documents' 
-  images: 'Images' 
-  music: 'Music' 
-  repositories: 'Repositories'
-  scripts: 'Scripts'
-  sources: 'Sources'
-  trash: 'Trash'
+  backups: '/home/remdec/Backups'
+  documents: '/home/remdec/Documents'
+  images: '/home/remdec/Images'
+  screens: '/home/remdec/Images/Screenshots'
+  traces: '/home/remdec/Images/Traces'
+  music: '/home/remdec/Music'
+  repositories: '/home/remdec/Repositories'
+  scripts: '/home/remdec/Scripts'
+  outputs: '/home/remdec/Scripts/Outputs'
+  sources: '/home/remdec/Sources'
+  trash: '/home/remdec/Trash'
 account:
-    username: 'remdec'
-    home: '/home/remdec'
-    userpass: '$6$8lp9e5Y3BouLjAn5$sMhPY1CX6PuI5MmFoLpz2B.1f9xE3xmDiy4MHevDLWttt4hcgM6BGkus/TXULdnF0rZrjVIAQUH7I0zYhVHIs.'
+  username: 'remdec'
+  home: '/home/remdec'
+  userpass: '$6$8lp9e5Y3BouLjAn5$sMhPY1CX6PuI5MmFoLpz2B.1f9xE3xmDiy4MHevDLWttt4hcgM6BGkus/TXULdnF0rZrjVIAQUH7I0zYhVHIs.'
+pkgs:
+  install_common: true
+  install_security: true

@@ -1,0 +1,59 @@
+n="echo"
+
+# retrieving info
+alias l="ls -alht"
+alias lR="ls -alhtR"
+alias get_distinfos="{ { hostnamectl || uname -a; } ; $n ; cat /etc/*-release ; $n ; cat /proc/version; } 2>/dev/null"
+alias get_diskinfos="{ fdisk -l ; $n ;  df -H ; $n ; lsblk -a ; $n ; free -hl; } 2>/dev/null"
+alias get_netwinfos="{ { ifconfig -a || ip a; } ; $n ; netstat -nr ; $n ; cat /etc/resolv.conf; } 2>/dev/null"
+alias get_hardinfos="{ hwinfo --short || lshw -short || lscpu; } 2>/dev/null"
+alias get_sysinfos="{ ba_distinfos ; $n ; $n ; ba_hardinfos ; $n ; $n ; ba_diskinfos ; $n ; $n ; ba_netwinfos ; } 2>/dev/null"
+alias get_listening="netstat -tulep"
+alias get_established="netstat -tupe | grep -E 'ESTABLISHED | SYN.*'"
+
+# moving
+alias go_backups="cd {{ tree.backups }}"
+alias go_docs="cd {{ tree.documents }}"
+alias go_images="cd {{ tree.images }}"
+alias go_music="cd {{ tree.music }}"
+alias go_repos="cd {{ tree.repositories }}"
+alias go_scripts="cd {{ tree.scripts }}"
+alias go_sources="cd {{ tree.sources }}"
+alias go_trash="cd {{ tree.trash }}"
+
+# shell behavior modification
+alias sh_extglob="shopt -s extglob"
+alias sh_noextglob="shopt -u extglob"
+
+# actions
+alias pd="pushd"
+alias od="popd"
+alias sd="dirs -v -p"
+
+alias gs="git status"
+alias gd="git diff"
+alias gp="git pull"
+
+function mv_trash {
+  mv "$1" "{{ tree.trash }}/"
+}
+
+function mv_sources {
+  mv "$1" "{{ tree.sources }}/"
+}
+
+function mv_backups {
+  mv "$1" "{{ tree.backups }}/"
+}
+
+function mv_traces {
+  mv "$1" "{{ tree.traces }}/"
+}
+
+function empty_trash {
+  mv "{{ tree.trash }}" /tmp/
+}
+
+
+# misc
+alias test_ping="ping -c 5 -i 0.5 8.8.8.8"
