@@ -1,0 +1,6 @@
+---
+- hosts: target
+  tasks:
+    - name: Install "foo" with option --classic
+      community.general.snap:
+        name: ksnip

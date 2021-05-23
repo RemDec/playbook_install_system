@@ -2,19 +2,24 @@ pkgs_minimal:
   - tree
   - htop
   - net-tools
-  - url
+  - curl
   - snapd
   - terminator
   - vim
   - git
+  - snapd
 
 pkgs_common:
-  - firefox
-  - ksnip
+  - firefox-esr
   - inkscape
   - gimp
 
 pkgs_security:
-  - security
-  - virtualbox
   - nmap
+
+snaps:
+   - core
+   - ksnip
+
+snaps_classic:
+    - intellij-idea-community

@@ -1,3 +1,14 @@
+- name: Install ntp package first to prevent timezone issues
+  ansible.builtin.package:
+    name: ntp
+    state: latest
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Restart ntp service to prevent timezone issues
+  ansible.builtin.service:
+    name: ntp
+    state: restarted
+
 - name: Install minimal packages
   ansible.builtin.package:
     name: "{{ pkgs_minimal }}"
@@ -17,3 +28,13 @@
     state: latest
   when: pkgs.install_security
   ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Install snap packages
+  community.general.snap:
+     name: "{{ snaps }}"
+
+- name: Install snap classic packages
+  community.general.snap:
+     name: "{{ item }}"
+     classic: yes
+  with_items: "{{ snaps_classic }}"
