@@ -31,6 +31,10 @@
 
 - name: Install snap packages
   community.general.snap:
+     name: "core"
+
+- name: Install snap packages
+  community.general.snap:
      name: "{{ snaps }}"
 
 - name: Install snap classic packages
