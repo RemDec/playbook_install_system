@@ -11,8 +11,6 @@ git_config:
     value: log --oneline
   - name: alias.last
     value: log -1 HEAD --stat
-  - name: alias.df
-    value: difftool
   - name: alias.search
     value: '!git rev-list --all | xargs git grep -F'
   - name: alias.graph

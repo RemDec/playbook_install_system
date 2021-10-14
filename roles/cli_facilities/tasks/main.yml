@@ -3,6 +3,22 @@
     src: bash_aliases.j2
     dest: "{{ account.home }}/.bash_aliases"
 
+- name: Push facilities scripts
+  copy:
+    src: files/
+    dest: "{{ tree.cli }}"
+    owner: "{{ account.username }}"
+    group: "{{ account.username }}"
+    mode: "0744"
+
+- name: Create symlinks to facilities
+  file:
+      src: "{{ tree.cli }}/{{ item | basename }}"
+      path: "/usr/bin/{{ item | basename | splitext | first }}"
+      state: link
+      force: yes
+  with_fileglob: files/*.sh
+
 - name: Git configuration
   community.general.git_config:
     name: "{{ item.name }}"
