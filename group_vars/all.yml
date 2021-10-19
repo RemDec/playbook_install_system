@@ -17,4 +17,5 @@ account:
   userpass: '$6$8lp9e5Y3BouLjAn5$sMhPY1CX6PuI5MmFoLpz2B.1f9xE3xmDiy4MHevDLWttt4hcgM6BGkus/TXULdnF0rZrjVIAQUH7I0zYhVHIs.'
 pkgs:
   install_common: true
-  install_security: true
+  install_security: false
+  install_snap: false

@@ -1,8 +1,14 @@
+- name: Restart NTP before all as it will take some time to apply
+  ansible.builtin.service:
+    name: ntp
+    state: restarted
+  ignore_errors: true
+
+
 - name: Create group for user
   group:
-    name: "{{ account.username }}" 
+    name: "{{ account.username }}"
     state: present
-
 
 - name: Create user if not present
   user:

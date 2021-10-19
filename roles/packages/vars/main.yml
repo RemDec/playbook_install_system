@@ -23,3 +23,6 @@ snaps:
 
 snaps_classic:
     - intellij-idea-community
+
+pkgs_toremove:
+    - ghostscript

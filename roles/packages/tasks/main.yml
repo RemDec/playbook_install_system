@@ -1,13 +1,25 @@
-- name: Install ntp package first to prevent timezone issues
-  ansible.builtin.package:
-    name: ntp
-    state: latest
-  ignore_errors: "{{ ansible_check_mode }}"
+- name: Try to work with package manager
+  block:
+    - name: Expected NTP already installed but try it as a dummy test
+      ansible.builtin.package:
+        name: ntp
+        state: latest
+      ignore_errors: "{{ ansible_check_mode }}"
+  rescue:
+    - name: Restart NTP because it is likely what prevents working with the package manager
+      ansible.builtin.service:
+        name: ntp
+        state: restarted
+      ignore_errors: true
+    - name: Wait a bit that date is updated
+      pause:
+        seconds: 10
 
-- name: Restart ntp service to prevent timezone issues
-  ansible.builtin.service:
-    name: ntp
-    state: restarted
+- name: Remove undesired packages
+  ansible.builtin.package:
+    name: "{{ pkgs_toremove }}"
+    state: absent
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Install minimal packages
   ansible.builtin.package:
@@ -29,16 +41,22 @@
   when: pkgs.install_security
   ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Install snap packages
+- name: Install snap core packages
   community.general.snap:
      name: "core"
+  when: pkgs.install_snap
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Install snap packages
   community.general.snap:
      name: "{{ snaps }}"
+  when: pkgs.install_snap
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Install snap classic packages
   community.general.snap:
      name: "{{ item }}"
      classic: yes
   with_items: "{{ snaps_classic }}"
+  when: pkgs.install_snap
+  ignore_errors: "{{ ansible_check_mode }}"

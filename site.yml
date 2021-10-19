@@ -1,5 +1,8 @@
 - hosts: target
   roles:
-    - system_setup    # create account, file hierarchy, etc.
-    - packages        # install required base packages
-    - cli_facilities  # aliases, bin symbolic links, etc.
+    - role: system_setup    # create account, file hierarchy, etc.
+      tags: sys, system
+    - role: packages        # install required base packages
+      tags: pkgs, packages
+    - role: cli_facilities  # aliases, bin symbolic links, etc.
+      tags: cli, facilities
