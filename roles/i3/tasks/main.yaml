@@ -4,6 +4,11 @@
       - lightdm
       - i3
 
+- name: Set lightdm as the default display manager
+  shell: |
+    echo "/usr/sbin/lightdm" > /etc/X11/default-display-manager
+    DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true dpkg-reconfigure lightdm
+
 - name: Ensure i3 config directory exists
   file:
     path: "{{ account.home }}/.config/i3"
