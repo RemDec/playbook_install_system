@@ -11,6 +11,7 @@ alias get_sysinfos="{ ba_distinfos ; $n ; $n ; ba_hardinfos ; $n ; $n ; ba_diski
 alias get_listening="netstat -tulep"
 alias get_established="netstat -tupe | grep -E 'ESTABLISHED | SYN.*'"
 
+
 # moving
 alias go_backups="cd {{ tree.backups }}"
 alias go_docs="cd {{ tree.documents }}"
@@ -21,9 +22,11 @@ alias go_scripts="cd {{ tree.scripts }}"
 alias go_sources="cd {{ tree.sources }}"
 alias go_trash="cd {{ tree.trash }}"
 
+
 # shell behavior modification
 alias sh_extglob="shopt -s extglob"
 alias sh_noextglob="shopt -u extglob"
+
 
 # actions
 alias pd="pushd"
@@ -53,6 +56,23 @@ function mv_traces {
 function empty_trash {
   mv "{{ tree.trash }}" /tmp/
 }
+
+function cdp {
+    if [ -z "$1" ]; then
+        cd ..
+    else
+        path='' # avoid sequential cd's to allow 'cd -'
+        for i in $(seq 1 $1); do
+            path+='/..'
+        done
+        cd $path
+    fi
+}
+
+function cdpp { cdp 2; }
+function cdppp { cdp 3; }
+function cdpppp { cdp 4; }
+function cdppppp { cdp 5; }
 
 
 # misc
