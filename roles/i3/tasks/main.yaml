@@ -1,0 +1,22 @@
+- name: Install required packages to have lightdm + i3
+  package:
+    name:
+      - lightdm
+      - i3
+
+- name: Ensure i3 config directory exists
+  file:
+    path: "{{ account.home }}/.config/i3"
+    state: directory
+
+- name: Render the i3 config file depending on the DE
+  template:
+    src: i3.config.j2
+    dest: "{{ account.home }}/.config/i3/config"
+    owner: "{{ account.username }}"
+    group: "{{ account.username }}"
+    mode: "0644"
+
+- name: Set i3 as the default WM
+  shell:
+    cmd: update-alternatives --install /usr/bin/x-session-manager x-session-manager /usr/bin/i3 100

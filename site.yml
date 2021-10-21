@@ -6,3 +6,6 @@
       tags: pkgs, packages
     - role: cli_facilities  # aliases, bin symbolic links, etc.
       tags: cli, facilities
+    - role: i3              # install i3 WM and configure system to use it
+      tags: i3
+

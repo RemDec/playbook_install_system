@@ -3,24 +3,26 @@
     name: ntp
     state: restarted
   ignore_errors: true
+  tags: always
 
+- block:
+    - name: Create group for user
+      group:
+        name: "{{ account.username }}"
+        state: present
 
-- name: Create group for user
-  group:
-    name: "{{ account.username }}"
-    state: present
-
-- name: Create user if not present
-  user:
-    name: "{{ account.username }}"
-    password: "{{ account.userpass }}"
-    home: "{{ account.home }}"
-    group: "{{ account.username }}"
-    groups:
-        - sudo
-    append: yes
-    generate_ssh_key: yes
-    shell: /bin/bash
+    - name: Create user if not present
+      user:
+        name: "{{ account.username }}"
+        password: "{{ account.userpass }}"
+        home: "{{ account.home }}"
+        group: "{{ account.username }}"
+        groups:
+            - sudo
+        append: yes
+        generate_ssh_key: yes
+        shell: /bin/bash
+  tags: user-mgmt
 
 
 - name: Create filesystem skeleton
