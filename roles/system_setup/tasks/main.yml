@@ -1,5 +1,5 @@
 - name: Restart NTP before all as it will take some time to apply
-  ansible.builtin.service:
+  service:
     name: ntp
     state: restarted
   ignore_errors: true

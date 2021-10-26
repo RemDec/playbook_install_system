@@ -35,3 +35,5 @@ Launch it using
 - packages : hypervisor level, config file only if package installed
 - cli_facilities : fonts, snippets (show c/c, ...)
 - i3 : config depending DE
+- launch_script : support running on localhost, show possible tags, overriding inventory, ...
+- use keys instead of password
