@@ -33,7 +33,7 @@
   package:
     name: "{{ pkgs_common }}"
     state: latest
-  when: pkgs.install_common
+  when: install_lvl.common
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Install security related packages
@@ -41,7 +41,7 @@
   package:
     name: "{{ pkgs_security }}"
     state: latest
-  when: pkgs.install_security
+  when: install_lvl.security
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Snap related stuff
@@ -54,18 +54,16 @@
       tags: pkgs_snap
       community.general.snap:
          name: "core"
-      when: pkgs.install_snap
     - name: Install snap packages
       tags: pkgs_snap
       community.general.snap:
          name: "{{ snaps }}"
-      when: pkgs.install_snap
     - name: Install snap classic packages
       tags: pkgs_snap
       community.general.snap:
          name: "{{ item }}"
          classic: yes
       with_items: "{{ snaps_classic }}"
-  when: pkgs.install_snap
+  when: install_lvl.snap
   tags: pkgs_snap
   ignore_errors: "{{ ansible_check_mode }}"

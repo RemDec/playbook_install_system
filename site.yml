@@ -8,4 +8,5 @@
       tags: cli, facilities
     - role: i3              # install i3 WM and configure system to use it
       tags: i3
-
+    - role: repositories
+      tags: repos, repositories

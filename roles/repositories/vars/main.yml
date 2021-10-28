@@ -1,0 +1,12 @@
+repos:
+  minimal:
+    - name: "TerminatorThemes"
+      url: "https://github.com/EliverLara/terminator-themes.git"
+      target_dir: "/tmp"
+      postclone: "D={{ account.home }}/.config/terminator/plugins/ && mkdir -p $D && cp /tmp/TerminatorThemes/plugin/terminator-themes.py $D"
+  common:
+    - name: "ThePentesterToolbar"
+      url: "https://github.com/RemDec/ThePentesterToolbar.git"
+  security:
+    - name: "ScannersBox"
+      url: "https://github.com/We5ter/Scanners-Box.git"

@@ -1,0 +1,30 @@
+- name: "Ensure git is installed on target machine"
+  package:
+    name: git
+    state: latest
+
+- name: "Clone repositories in minimal list"
+  git:
+    repo: "{{ item.url }}"
+    dest: "{{ item.target_dir | default(tree.repositories) }}/{{ item.name | default() }}"
+  with_items: "{{ repos.minimal }}"
+
+- name: "Clone repositories in common list"
+  git:
+    repo: "{{ item.url }}"
+    dest: "{{ item.target_dir | default(tree.repositories) }}/{{ item.name | default() }}"
+  when: install_lvl.common
+  with_items: "{{ repos.common }}"
+
+- name: "Clone repositories in security list"
+  git:
+    repo: "{{ item.url }}"
+    dest: "{{ item.target_dir | default(tree.repositories) }}/{{ item.name | default() }}"
+  when: install_lvl.security
+  with_items: "{{ repos.security }}"
+
+- name: "Launch scripts post clone for minimal list"
+  shell: "{{ item.postclone }}"
+  args:
+    executable: /bin/bash
+  with_items: "{{ repos.minimal }}"
