@@ -6,25 +6,39 @@
 - name: "Clone repositories in minimal list"
   git:
     repo: "{{ item.url }}"
-    dest: "{{ item.target_dir | default(tree.repositories) }}/{{ item.name | default() }}"
+    dest: "{{ item.target_dir | default(tree.repositories) }}/{{ item.name }}"
   with_items: "{{ repos.minimal }}"
 
 - name: "Clone repositories in common list"
   git:
     repo: "{{ item.url }}"
-    dest: "{{ item.target_dir | default(tree.repositories) }}/{{ item.name | default() }}"
+    dest: "{{ item.target_dir | default(tree.repositories) }}/{{ item.name }}"
   when: install_lvl.common
   with_items: "{{ repos.common }}"
 
 - name: "Clone repositories in security list"
   git:
     repo: "{{ item.url }}"
-    dest: "{{ item.target_dir | default(tree.repositories) }}/{{ item.name | default() }}"
+    dest: "{{ item.target_dir | default(tree.repositories) }}/{{ item.name }}"
   when: install_lvl.security
   with_items: "{{ repos.security }}"
 
-- name: "Launch scripts post clone for minimal list"
-  shell: "{{ item.postclone }}"
+- name: "Launch postclone scripts for minimal list"
+  shell: "{{ item.postclone | default(':') }}"
   args:
     executable: /bin/bash
   with_items: "{{ repos.minimal }}"
+
+- name: "Launch postclone scripts for common list"
+  shell: "{{ item.postclone | default(':') }}"
+  args:
+    executable: /bin/bash
+  when: install_lvl.common
+  with_items: "{{ repos.common }}"
+
+- name: "Launch postclone scripts for security list"
+  shell: "{{ item.postclone | default(':') }}"
+  args:
+    executable: /bin/bash
+  when: install_lvl.security
+  with_items: "{{ repos.security }}"
