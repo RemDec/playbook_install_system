@@ -70,7 +70,7 @@ info_user() {
 info_cwd() {
   cwd=$(pwd | sed "s#${HOME}#~#g")
   perms=$(stat -c '%a' .)
-  is_owner_col="$GREY"
+  is_owner_col="$GRAY"
   if [ "$user" = $(stat -c '%U' .) ]; then
     is_owner_col="$LIGHTGREEN"
   fi
@@ -111,27 +111,42 @@ info_git() {
 
   if [ $git_branch ]
   then
-    status=$(git status --porcelain 2>/dev/null)
+    status=$(git status -b --porcelain 2>/dev/null)
+    branch="${status[0]}"
 
     block_col="$WHITE"
-    count_not_staged=$(for i in "$status"; do echo "$i"; done | grep -v '^?? ' | sed '/^$/d' | wc -l | sed "s/ //g")
-    color_not_staged="$LIGHTGREEN"
-    if [ ! $count_not_staged = "0" ]; then
-      color_not_staged="$SHARPRED"
+    branch_col="$LIGHTGRAY"
+    if [[ "$branch" =~ "ahead" ]]; then branch_col="$LIGHTCYAN"; fi
+    if [[ "$branch" =~ "behind" ]]; then branch_col="$YELLOW"; fi
+
+    count_unstaged=$(for i in "$status"; do echo "$i"; done | grep -v '^?? ' | sed '/^$/d' | wc -l | sed "s/ //g")
+    unstaged_col="$GRAY"
+    if [ ! $count_unstaged = "0" ]; then
+      unstaged_col="$SHARPRED"
       block_col="$DEEPRED"
     fi
 
     count_untracked=$(for i in "$status"; do echo "$i"; done | grep '^?? ' | sed '/^$/d' | wc -l | sed "s/ //g")
-    color_ut="$LIGHTGREEN"
+    untracked_col="$GRAY"
     if [ ! $count_untracked = "0" ]; then
-      color_ut="$SHARPRED"
+      untracked_col="$SHARPRED"
       block_col="$DEEPRED"
     fi
+    content="$branch_col${git_branch} $unstaged_col${count_unstaged}$(bold_it 's')$untracked_col${count_untracked}$(bold_it 't')"
 
-    echo -e "$SHARPYELLOW─${block_col}⟦${git_branch}$WHITE:$color_not_staged${count_not_staged}$WHITE:$color_ut${count_untracked}${block_col}⟧"
+    echo -e "$SHARPYELLOW─$block_col⟦${content}$block_col⟧"
   fi
 }
 
+info_resources() {
+  block_col="$WHITE"
+  proc="$(echo 100 - $(mpstat -P all | tail -1 | awk '{print $12}') | bc | cut -d'.' -f1)%"
+  mem="$(free | grep Mem | awk '{print $3/$2 * 100}' | cut -d'.' -f1)%"
+
+  content="${proc}P ${mem}M"
+
+  echo -e "$SHARPYELLOW─$block_col⟦${content}$block_col⟧"
+}
 
 prompt_return_code() {
   if [ "$?" -eq "0" ]; then
@@ -145,7 +160,7 @@ prompt_return_code() {
 # ---- Main
 
 set_bash_prompt() {
-  PS1="${SHARPYELLOW}┌$(info_user)$(info_cwd)$(info_git)$(info_jobs)${DEFAULT}"
+  PS1="${SHARPYELLOW}┌$(info_user)$(info_cwd)$(info_git)$(info_jobs)$(info_resources)${DEFAULT}"
   PS1+="\n$(prompt_return_code) ${DEFAULT}"
 }
 
