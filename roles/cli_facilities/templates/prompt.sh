@@ -55,26 +55,28 @@ DARKGRAY=$(color "90")
 
 # ---- Common properties
 
-is_root=false
-if [ "$UID" = 0 ]; then
-  is_root=true
-fi
-user=$(whoami)
+IS_ROOT=false
+if [ "$UID" = 0 ]; then IS_ROOT=true; fi
+USER=$(whoami)
 
+# 'Energy' determines wire's color between boxes + load bar color in the resources box
 BG_ENERGY="$BG_LIGHTYELLOW"
 ENERGY="$SHARPYELLOW"
 
+PROC_USAGE="??"  # Overall current CPU usage in %
+RAM_USAGE="??"  # Overall RAM usage in %
+TOTAL_USAGE="??"  # A bit dumb metric combininb CPU + Mem load
 compute_resource() {
-  proc_val="$(echo 100 - $(mpstat -P all | tail -1 | awk '{print $12}') | bc | cut -d'.' -f1)"
-  mem_val="$(free | grep Mem | awk '{print $3/$2 * 100}' | cut -d'.' -f1)"
-  total_load=$(( (proc_val + mem_val)/2 ))
-  if (( $total_load < 65 )); then
+  PROC_USAGE="$(echo 100 - $(mpstat -P all | tail -1 | awk '{print $12}') | bc | cut -d'.' -f1)"
+  RAM_USAGE="$(free | grep Mem | awk '{print $3/$2 * 100}' | cut -d'.' -f1)"
+  TOTAL_USAGE=$(( (PROC_USAGE + RAM_USAGE)/2 ))
+  if (( $TOTAL_USAGE < 65 )); then
     BG_ENERGY=$(bg_color_256 "226")
     ENERGY=$(color_256 "226")
-  elif (( $total_load < 80 )); then
+  elif (( $TOTAL_USAGE < 80 )); then
     BG_ENERGY=$(bg_color_256 "214")
     ENERGY=$(color_256 "214")
-  elif (( $total_load < 90 )); then
+  elif (( $TOTAL_USAGE < 90 )); then
     BG_ENERGY=$(bg_color_256 "202")
     ENERGY=$(color_256 "202")
   else
@@ -88,7 +90,7 @@ compute_resource() {
 info_user() {
   u_col="$LIGHTCYAN"
   block_col="$WHITE"
-  if [ "$is_root" = true ]; then
+  if [ "$IS_ROOT" = true ]; then
     u_col="$RED"
     block_col="$RED"
   fi
@@ -99,22 +101,34 @@ info_cwd() {
   cwd=$(pwd | sed "s#${HOME}#~#g")
   perms=$(stat -c '%a' .)
   is_owner_col="$GRAY"
-  if [ "$user" = $(stat -c '%U' .) ]; then
+  if [ "$USER" = $(stat -c '%U' .) ]; then
     is_owner_col="$LIGHTGREEN"
   fi
+  # Info about the files in cwd
   nbr_files=$(find .  -maxdepth 1 -mindepth 1 -type f -printf '.' | wc -c)
-  files="$WHITE${nbr_files}$(bold_it 'f')"
-  if (( ${nbr_files} > 99 )); then files="$SHARPRED⍏$(bold_it 'f')"; fi
-
+  files=""
+  if [ ! "$nbr_files" = "0" ]; then
+    files="$WHITE${nbr_files}$(bold_it 'f')"
+    if (( ${nbr_files} > 99 )); then files="$SHARPRED⍏$(bold_it 'f')"; fi
+  fi
+  # Info about the subdirectories in cwd
   nbr_dir=$(find .  -maxdepth 1 -mindepth 1 -type d -printf '.' | wc -c)
-  dir="$WHITE${nbr_dir}$(bold_it 'd')"
-  if (( ${nbr_dir} > 99 )); then dir="$SHARPRED⍏$(bold_it 'd')"; fi
-
+  dir=""
+  if [ ! "$nbr_dir" = "0" ]; then
+    dir="$WHITE${nbr_dir}$(bold_it 'd')"
+    if (( ${nbr_dir} > 99 )); then dir="$SHARPRED⍏$(bold_it 'd')"; fi
+  fi
+  # Info about the symbolic links in cwd
   nbr_syml=$(find .  -maxdepth 1 -mindepth 1 -type l -printf '.' | wc -c)
-  symlinks="$WHITE${nbr_syml}$(bold_it 'l')"
-  if (( ${nbr_syml} > 99 )); then symlinks="$SHARPRED⍏$(bold_it 'l')"; fi
+  symlinks=""
+  if [ ! "$nbr_syml" = "0" ]; then
+    symlinks="$WHITE${nbr_syml}$(bold_it 'l')"
+    if (( ${nbr_syml} > 99 )); then symlinks="$SHARPRED⍏$(bold_it 'l')"; fi
+  fi
 
-  content="${is_owner_col}$perms $WHITE${cwd} ${files}${dir}${symlinks}"
+  counters="${files}${dir}${symlinks}"
+  if [ -z "$counters" ]; then counters="Ø"; fi
+  content="${is_owner_col}$perms $WHITE${cwd} ${counters}"
   block_col="$WHITE"
   if [[ "$content" =~ "$SHARPRED" ]];then
     block_col="$DEEPRED"
@@ -139,8 +153,9 @@ info_git() {
 
   if [ $git_branch ]
   then
-    status=$(git status -b --porcelain 2>/dev/null)
-    branch="${status[0]}"
+    readarray -t status_out<<<$(git status -b --porcelain 2>/dev/null)
+    branch="${status_out[0]}"
+    status=( ${status_out[@]:1} )
 
     block_col="$WHITE"
     branch_col="$LIGHTGRAY"
@@ -160,7 +175,11 @@ info_git() {
       untracked_col="$SHARPRED"
       block_col="$DEEPRED"
     fi
-    content="$branch_col${git_branch} $unstaged_col${count_unstaged}$(bold_it 's')$untracked_col${count_untracked}$(bold_it 't')"
+    counters=""  # save space if all clean
+    if [ ! "$count_unstaged$count_untracked" = "00" ]; then
+      counters=" $unstaged_col${count_unstaged}$(bold_it 's')$untracked_col${count_untracked}$(bold_it 't')"
+    fi
+    content="$branch_col${git_branch}${counters}"
 
     echo -e "$ENERGY─$block_col⟦${content}$block_col⟧"
   fi
@@ -168,14 +187,14 @@ info_git() {
 
 info_resources() {
   block_col="$WHITE"
-  if [[ $proc_val > 85 || $mem_val > 85 ]]; then
+  if [[ $PROC_USAGE > 85 || $RAM_USAGE > 85 ]]; then
     block_col="$DEEPRED"
   fi
 
-  content="${proc_val}%cpu ${mem_val}%mem"
+  content="${PROC_USAGE}%λ ${RAM_USAGE}%Ξ"
   content_col="$BLACK"
   len_content="${#content}"
-  pos_load_bar=$(( (len_content * total_load)/100 ))
+  pos_load_bar=$(( (len_content * TOTAL_USAGE)/100 ))
   bar_col="$BG_ENERGY"
   content_load_bar="$content_col$bar_col${content:0:pos_load_bar}$BG_DEFAULT$content_col${content:pos_load_bar}"
 
