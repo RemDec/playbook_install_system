@@ -9,21 +9,24 @@ pkgs_minimal:
   - git
   - screen
   - whois
+  - dnsutils
+  - xclip
 
 pkgs_common:
   - firefox-esr
   - inkscape
   - gimp
+  - wireshark
 
 pkgs_security:
   - nmap
 
 snaps:
-   - snapd
-   - ksnip
+  - snapd
+  - ksnip
 
 snaps_classic:
-    - intellij-idea-community
+  - intellij-idea-community
 
 pkgs_toremove:
-    - ghostscript
+  - ghostscript
