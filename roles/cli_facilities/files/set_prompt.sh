@@ -1,5 +1,8 @@
 #!/usr/bin/bash
 
+LAST_STATUS="$?"
+
+
 # ---- Color stuff
 BASE="\[\e[0m\]"
 color() {
@@ -50,12 +53,12 @@ LIGHTMAGENTA=$(color "95")
 CYAN=$(color "36")
 LIGHTCYAN=$(color "96")
 GRAY=$(color "37")
+BG_GRAY=$(bg_color_256 "246")
 DARKGRAY=$(color "90")
 
 
 # ---- Common properties
 
-LAST_STATUS="$?"
 
 IS_ROOT=false
 if [ "$UID" = 0 ]; then IS_ROOT=true; fi
@@ -69,8 +72,8 @@ PROC_USAGE="??"  # Overall current CPU usage in %
 RAM_USAGE="??"  # Overall RAM usage in %
 TOTAL_USAGE="??"  # A bit dumb metric combininb CPU + Mem load
 compute_resource() {
-  PROC_USAGE="$(echo 100 - $(mpstat -P all | tail -1 | awk '{print $NF}') | bc | cut -d'.' -f1)"
-  RAM_USAGE="$(free | grep Mem | awk '{print $3/$2 * 100}' | cut -d'.' -f1)"
+  PROC_USAGE="$(echo 100 - $(mpstat -P all | tail -1 | awk '{print $NF}') | bc | cut -d'.' -f1 | sed 's/^$/1/')"
+  RAM_USAGE="$(free | grep Mem | awk '{print $3/$2 * 100}' | cut -d'.' -f1 | sed 's/^$/1/')"
   TOTAL_USAGE=$(( (PROC_USAGE + RAM_USAGE)/2 ))
   if (( $TOTAL_USAGE < 65 )); then
     BG_ENERGY=$(bg_color_256 "226")
@@ -165,21 +168,29 @@ info_git() {
   then
     readarray -t status_out<<<$(git status -b --porcelain 2>/dev/null)
     branch="${status_out[0]}"
-    status=( ${status_out[@]:1} )
 
     block_col="$WHITE"
     branch_col="$LIGHTGRAY"
     if [[ "$branch" =~ "ahead" ]]; then branch_col="$LIGHTCYAN"; fi
     if [[ "$branch" =~ "behind" ]]; then branch_col="$YELLOW"; fi
 
-    count_unstaged=$(for i in "$status"; do echo "$i"; done | grep -v '^?? ' | sed '/^$/d' | wc -l | sed "s/ //g")
+    count_unstaged=0
+    count_untracked=0
+    for s_line in "${status_out[@]:1}"; do
+      if [[ "$s_line" =~ ^[[:blank:]]M ]]; then
+        ((count_unstaged++))
+      elif [[ "$s_line" =~ ^\?\? ]]; then
+        ((count_untracked++))
+      fi
+      echo "$s_line st $count_unstaged tr $count_untracked" >> /tmp/test
+    done
+
     unstaged_col="$GRAY"
     if [ ! $count_unstaged = "0" ]; then
       unstaged_col="$SHARPRED"
       block_col="$DEEPRED"
     fi
 
-    count_untracked=$(for i in "$status"; do echo "$i"; done | grep '^?? ' | sed '/^$/d' | wc -l | sed "s/ //g")
     untracked_col="$GRAY"
     if [ ! $count_untracked = "0" ]; then
       untracked_col="$SHARPRED"
@@ -206,7 +217,8 @@ info_resources() {
   len_content="${#content}"
   pos_load_bar=$(( (len_content * TOTAL_USAGE)/100 ))
   bar_col="$BG_ENERGY"
-  content_load_bar="$content_col$bar_col${content:0:pos_load_bar}$BG_DEFAULT$content_col${content:pos_load_bar}"
+  remaining_bar_col="$BG_GRAY"
+  content_load_bar="$content_col$bar_col${content:0:pos_load_bar}$BASE$content_col$remaining_bar_col${content:pos_load_bar}$BASE"
 
   echo -e "$ENERGY─$block_col⟦${content_load_bar}$block_col⟧"
 }
