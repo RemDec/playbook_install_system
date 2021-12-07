@@ -72,8 +72,8 @@ PROC_USAGE="??"  # Overall current CPU usage in %
 RAM_USAGE="??"  # Overall RAM usage in %
 TOTAL_USAGE="??"  # A bit dumb metric combininb CPU + Mem load
 compute_resource() {
-  PROC_USAGE="$(echo 100 - $(mpstat -P all | tail -1 | awk '{print $NF}') | bc | cut -d'.' -f1 | sed 's/^$/1/')"
-  RAM_USAGE="$(free | grep Mem | awk '{print $3/$2 * 100}' | cut -d'.' -f1 | sed 's/^$/1/')"
+  PROC_USAGE="$(type mpstat &>/dev/null && echo 100 - $(mpstat -P all | tail -1 | awk '{print $NF}') | bc | cut -d'.' -f1 | sed 's/^$/1/')"
+  RAM_USAGE="$(type free &>/dev/null && free | grep Mem | awk '{print $3/$2 * 100}' | cut -d'.' -f1 | sed 's/^$/1/')"
   TOTAL_USAGE=$(( (PROC_USAGE + RAM_USAGE)/2 ))
   if (( $TOTAL_USAGE < 65 )); then
     BG_ENERGY=$(bg_color_256 "226")
