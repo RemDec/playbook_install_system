@@ -1,0 +1,4 @@
+if [[ $TERM != linux ]]; then
+  export PROMPT_COMMAND="source /usr/bin/set_prompt"
+fi
+

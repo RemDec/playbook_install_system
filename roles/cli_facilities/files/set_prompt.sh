@@ -1,30 +1,30 @@
 #!/usr/bin/bash
 
 # ---- Color stuff
-BASE="\e[0m"
+BASE="\[\e[0m\]"
 color() {
   code="$1"
-  echo "\e[${code}m"
+  echo "\[\e[${code}m\]"
 }
 
 color_256() {
   code="$1"
-  echo "\e[38;5;${code}m"
+  echo "\[\e[38;5;${code}m\]"
 }
 
 bg_color_256() {
   code="$1"
-  echo "\e[48;5;${code}m"
+  echo "\[\e[48;5;${code}m\]"
 }
 
 bold_it() {
   text="$1"
-  echo "\e[1m$text${BASE}"
+  echo "\[\e[1m\]$text${BASE}"
 }
 
 light_it() {
   text="$1"
-  echo "\e[2m$text${BASE}"
+  echo "\[\e[2m\]$text${BASE}"
 }
 
 DEFAULT=$(color "39")
@@ -55,9 +55,11 @@ DARKGRAY=$(color "90")
 
 # ---- Common properties
 
+LAST_STATUS="$?"
+
 IS_ROOT=false
 if [ "$UID" = 0 ]; then IS_ROOT=true; fi
-USER=$(whoami)
+MY_USER=$(whoami)
 
 # 'Energy' determines wire's color between boxes + load bar color in the resources box
 BG_ENERGY="$BG_LIGHTYELLOW"
@@ -67,7 +69,7 @@ PROC_USAGE="??"  # Overall current CPU usage in %
 RAM_USAGE="??"  # Overall RAM usage in %
 TOTAL_USAGE="??"  # A bit dumb metric combininb CPU + Mem load
 compute_resource() {
-  PROC_USAGE="$(echo 100 - $(mpstat -P all | tail -1 | awk '{print $12}') | bc | cut -d'.' -f1)"
+  PROC_USAGE="$(echo 100 - $(mpstat -P all | tail -1 | awk '{print $NF}') | bc | cut -d'.' -f1)"
   RAM_USAGE="$(free | grep Mem | awk '{print $3/$2 * 100}' | cut -d'.' -f1)"
   TOTAL_USAGE=$(( (PROC_USAGE + RAM_USAGE)/2 ))
   if (( $TOTAL_USAGE < 65 )); then
@@ -97,11 +99,19 @@ info_user() {
   echo -e "$block_col⟦$u_col$(bold_it '\u')$WHITE$(bold_it '@')$DEEPBLUE\h$block_col⟧"
 }
 
+short_pwd() {
+  cwd=$(pwd | sed "s#${HOME}#~#g" | perl -F/ -ane 'print join( "/", map { $i++ < @F - 1 ?  substr $_,0,1 : $_ } @F)')
+  echo -n $cwd
+}
+
 info_cwd() {
   cwd=$(pwd | sed "s#${HOME}#~#g")
+  if [[ "${#cwd}" > 80 ]]; then  # let's short the path keeping first letters of parent directories
+    cwd=$(echo "$cwd" | perl -F/ -ane 'print join( "/", map { $i++ < @F - 1 ?  substr $_,0,1 : $_ } @F)')
+  fi
   perms=$(stat -c '%a' .)
   is_owner_col="$GRAY"
-  if [ "$USER" = $(stat -c '%U' .) ]; then
+  if [ "$MY_USER" = $(stat -c '%U' .) ]; then
     is_owner_col="$LIGHTGREEN"
   fi
   # Info about the files in cwd
@@ -202,7 +212,7 @@ info_resources() {
 }
 
 prompt_return_code() {
-  if [ "$?" -eq "0" ]; then
+  if [ "$LAST_STATUS" = "0" ]; then
     echo -e "$ENERGY└─$GREEN▣$ENERGY─━╼"
   else
     echo -e "$ENERGY└─$RED▢$ENERGY─━╼"
@@ -213,8 +223,8 @@ prompt_return_code() {
 # ---- Main
 
 set_bash_prompt() {
-  PS1="${ENERGY}┌$(info_user)$(info_cwd)$(info_git)$(info_jobs)$(info_resources)${DEFAULT}"
-  PS1+="\n$(prompt_return_code) ${DEFAULT}"
+  info_line="${ENERGY}┌$(info_user)$(info_cwd)$(info_git)$(info_jobs)$(info_resources)${DEFAULT}"
+  export PS1="${info_line}\n$(prompt_return_code) ${DEFAULT}"
 }
 
 compute_resource

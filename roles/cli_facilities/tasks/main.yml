@@ -11,13 +11,18 @@
     group: "{{ account.username }}"
     mode: "0744"
 
-- name: Create symlinks to facilities
+- name: Create symlinks to facilities for all .sh scripts in 'files' directory
   file:
       src: "{{ tree.cli }}/{{ item | basename }}"
       path: "/usr/bin/{{ item | basename | splitext | first }}"
       state: link
       force: yes
   with_fileglob: files/*.sh
+
+- name: Bash configuration
+  blockinfile:
+    path: "{{ account.home }}/.bashrc"
+    block: "{{ lookup('template', 'add_to_bashrc') }}"
 
 - name: Git configuration
   community.general.git_config:
