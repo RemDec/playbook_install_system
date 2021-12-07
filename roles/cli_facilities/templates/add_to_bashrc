@@ -1,4 +1,10 @@
-if [[ $TERM != linux ]]; then
+# === Beginning of custom config
+
+if [[ -t 0 && $- = *i* ]]; then  # Disable pause/resume feature (Ctrl+s)
+    stty -ixon
+fi
+
+if [[ $TERM != linux ]]; then  # Set the custom bash prompt
   export PROMPT_COMMAND="source /usr/bin/set_prompt"
 fi
 
