@@ -12,6 +12,7 @@ pkgs_minimal:
   - dnsutils
   - xclip
   - sysstat
+  - bc
 
 pkgs_common:
   - firefox-esr
