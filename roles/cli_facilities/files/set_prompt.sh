@@ -179,9 +179,12 @@ info_git() {
 
     count_unstaged=0
     count_untracked=0
+    count_staged=0
     for s_line in "${status_out[@]:1}"; do
       if [[ "$s_line" =~ ^[[:blank:]]M ]]; then
         ((count_unstaged++))
+      elif [[ "$s_line" =~ ^M[[:blank]] ]]; then
+        ((count_staged++))
       elif [[ "$s_line" =~ ^\?\? ]]; then
         ((count_untracked++))
       fi
