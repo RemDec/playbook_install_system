@@ -5,6 +5,7 @@ LAST_STATUS="$?"
 
 # ---- Color stuff
 BASE="\[\e[0m\]"
+RESET_BOLD_DIM="\[\e[22m\]"
 color() {
   code="$1"
   echo "\[\e[${code}m\]"
@@ -22,12 +23,12 @@ bg_color_256() {
 
 bold_it() {
   text="$1"
-  echo "\[\e[1m\]$text${BASE}"
+  echo "\[\e[1m\]${text}${RESET_BOLD_DIM}"
 }
 
 light_it() {
   text="$1"
-  echo "\[\e[2m\]$text${BASE}"
+  echo "\[\e[2m\]${text}${RESET_BOLD_DIM}"
 }
 
 DEFAULT=$(color "39")
@@ -70,10 +71,12 @@ ENERGY="$SHARPYELLOW"
 
 PROC_USAGE="??"  # Overall current CPU usage in %
 RAM_USAGE="??"  # Overall RAM usage in %
+MAX_USAGE="??"  # Max of proc and ram usages
 TOTAL_USAGE="??"  # A bit dumb metric combininb CPU + Mem load
 compute_resource() {
   PROC_USAGE="$(type mpstat &>/dev/null && echo 100 - $(mpstat -P all | tail -1 | awk '{print $NF}') | bc | cut -d'.' -f1 | sed 's/^$/1/')"
   RAM_USAGE="$(type free &>/dev/null && free | grep Mem | awk '{print $3/$2 * 100}' | cut -d'.' -f1 | sed 's/^$/1/')"
+  MAX_USAGE=$(( PROC_USAGE > RAM_USAGE ? PROC_USAGE : RAM_USAGE ))
   TOTAL_USAGE=$(( (PROC_USAGE + RAM_USAGE)/2 ))
   if (( $TOTAL_USAGE < 65 )); then
     BG_ENERGY=$(bg_color_256 "226")
@@ -99,7 +102,7 @@ info_user() {
     u_col="$RED"
     block_col="$RED"
   fi
-  echo -e "$block_col⟦$u_col$(bold_it '\u')$WHITE$(bold_it '@')$DEEPBLUE\h$block_col⟧"
+  echo -e "$block_col⟦$u_col$(bold_it '\u')$WHITE$(bold_it '@')$DEEPBLUE$(light_it '\h')$block_col⟧"
 }
 
 short_pwd() {
@@ -139,9 +142,9 @@ info_cwd() {
     if (( ${nbr_syml} > 99 )); then symlinks="$SHARPRED⍏$(bold_it 'l')"; fi
   fi
 
-  counters="${files}${dir}${symlinks}"
+  counters="$(light_it "${files}")$(light_it "${dir}")$(light_it "${symlinks}")"
   if [ -z "$counters" ]; then counters="Ø"; fi
-  content="${is_owner_col}$perms $WHITE${cwd} ${counters}"
+  content="${is_owner_col}$perms $WHITE$(bold_it "${cwd}") ${counters}"
   block_col="$WHITE"
   if [[ "$content" =~ "$SHARPRED" ]];then
     block_col="$DEEPRED"
@@ -219,6 +222,8 @@ info_resources() {
   bar_col="$BG_ENERGY"
   remaining_bar_col="$BG_GRAY"
   content_load_bar="$content_col$bar_col${content:0:pos_load_bar}$BASE$content_col$remaining_bar_col${content:pos_load_bar}$BASE"
+  content_load_bar=${content_load_bar/λ/$(bold_it 'λ')}
+  content_load_bar=${content_load_bar/Ξ/$(bold_it 'Ξ')}
 
   echo -e "$ENERGY─$block_col⟦${content_load_bar}$block_col⟧"
 }
