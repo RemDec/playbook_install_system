@@ -3,7 +3,7 @@ pkgs_minimal:
   - htop
   - net-tools
   - curl
-  - snapd
+  - zip
   - terminator
   - vim
   - git
