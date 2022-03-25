@@ -1,4 +1,8 @@
 - hosts: target
+  become: yes
+  vars:
+    - final_username: "{{ username | default(account.username) }}"
+    - final_userpass: "{{ userpass | default(account.userpass) }}"
   roles:
     - role: system_setup    # create account, file hierarchy, etc.
       tags: sys, system
