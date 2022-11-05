@@ -1,0 +1,168 @@
+###############################################################################
+# Launcher dialogs
+###############################################################################
+
+set $systerminal /usr/bin/x-terminal-emulator
+set $sysbrowser firefox
+set $syscenter regolith-control-center
+set $sysapplauncher 
+set $sysmonitor gnome-system-monitor
+set $sysfilebrowser /usr/bin/nautilus --new-window
+set $sysscreenshot gnome-screenshot
+set $sysnewfile terminator --working-directory=$HOME -e vim
+ 
+
+## Launch // Terminal // <><Ctrl> t ##
+set_from_resource $i3-wm.binding.terminal i3-wm.binding.terminal Ctrl+t
+bindsym $mod+$i3-wm.binding.terminal exec --no-startup-id $systerminal
+
+## Launch // Browser // <><Ctrl> b ##
+set_from_resource $i3-wm.binding.browser i3-wm.binding.browser Ctrl+b
+bindsym $mod+$i3-wm.binding.browser exec --no-startup-id $sysbrowser
+
+## Launch // System Center // <><Ctrl> s ##
+set_from_resource $i3-wm.binding.syscenter i3-wm.binding.syscenter Ctrl+s
+bindsym $mod+$i3-wm.binding.syscenter exec --no-startup-id $syscenter
+
+## Launch // System monitor // <><Ctrl> m ##
+set_from_resource $i3-wm.binding.sysmonitor i3-wm.binding.sysmonitor Ctrl+m
+bindsym $mod+$i3-wm.binding.sysmonitor exec --no-startup-id $sysmonitor
+
+## Launch // File browser // <><Ctrl> e ##
+set_from_resource $i3-wm.binding.sysfilebrowser i3-wm.binding.sysfilebrowser Ctrl+e
+bindsym $mod+$i3-wm.binding.sysfilebrowser exec --no-startup-id $sysfilebrowser
+
+## Launch // Screenshot // <><Ctrl> c ##
+set_from_resource $i3-wm.binding.screenshot i3-wm.binding.screenshot Ctrl+c
+bindsym $mod+$i3-wm.binding.screenshot exec --no-startup-id $sysscreenshot
+
+## Launch // New file // <><Ctrl> w ##
+set_from_resource $i3-wm.binding.sysnewfile i3-wm.binding. Ctrl+w
+bindsym $mod+$i3-wm.binding.sysnewfile exec --no-startup-id $sysnewfile
+
+
+#=== Ilia launcher ===
+# Load stylesheet if exists
+set_from_resource $ilia.stylesheet ilia.stylesheet
+
+## Launch // Application // <><Ctrl> l ##
+set_from_resource $i3-wm.binding.launcher.app i3-wm.binding.launcher.app Ctrl+l
+set_from_resource $i3-wm.program.launcher.app i3-wm.program.launcher.app ilia -p apps
+bindsym $mod+$i3-wm.binding.launcher.app exec --no-startup-id $i3-wm.program.launcher.app -t $ilia.stylesheet
+
+## Launch // Command // <><Ctrl> Space ##
+set_from_resource $i3-wm.binding.launcher.cmd i3-wm.binding.launcher.cmd Ctrl+space
+set_from_resource $i3-wm.program.launcher.cmd i3-wm.program.launcher.cmd ilia -p terminal
+bindsym $mod+$i3-wm.binding.launcher.cmd exec --no-startup-id $i3-wm.program.launcher.cmd -t $ilia.stylesheet
+
+## Launch // File Search // <><Ctrl> f ##
+set_from_resource $i3-wm.binding.file_search i3-wm.binding.file_search Ctrl+f
+set_from_resource $i3-wm.program.file_search i3-wm.program.file_search ilia -p tracker
+bindsym $mod+$i3-wm.binding.file_search exec --no-startup-id $i3-wm.program.file_search -t $ilia.stylesheet
+
+
+###############################################################################
+# Window and Workspace Navigation
+###############################################################################
+
+## Navigate // Window by Name // <><Ctrl> Tab ##
+set_from_resource $i3-wm.binding.launcher.window i3-wm.binding.launcher.window Ctrl+Tab
+set_from_resource $i3-wm.program.launcher.window i3-wm.program.launcher.window ilia -p windows
+bindsym $mod+$i3-wm.binding.launcher.window exec --no-startup-id $i3-wm.program.launcher.window -t $ilia.stylesheet
+
+## Navigate // Relative Parent // <> q ##/
+set_from_resource $i3-wm.binding.focus_parent i3-wm.binding.focus_parent q
+bindsym $mod+$i3-wm.binding.focus_parent focus parent
+
+## Navigate // Relative Child // <> w ##/
+set_from_resource $i3-wm.binding.focus_child i3-wm.binding.focus_child w
+bindsym $mod+$i3-wm.binding.focus_child focus child
+
+## Navigate // Scratchpad // <> x ##
+set_from_resource $i3-wm.binding.scratchpad i3-wm.binding.scratchpad x
+bindsym $mod+$i3-wm.binding.scratchpad scratchpad show
+
+## Navigate // Last Focused Window // <> Tab ##
+set_from_resource $i3-wm.binding.swap_focus i3-wm.binding.swap_focus Tab
+bindsym $mod+$i3-wm.binding.swap_focus exec --no-startup-id pkill -USR1 -F "${XDG_RUNTIME_DIR}/swap_focus.pid"
+
+exec --no-startup-id i3-swap-focus
+
+## Navigate // Change focus to other screen // <> [1] [3] ##
+# move focus on left/right monitor with bottom numerical keypad (Mod2 doesn't have to be pressed but needed, see https://github.com/i3/i3/issues/2558)
+bindsym $mod+Mod2+KP_1 focus output left
+bindsym $mod+Mod2+KP_3 focus output right
+
+
+###############################################################################
+# Window and Workspace Actions
+###############################################################################
+
+## Modify // Carry Window to Next Free Workspace // <> ² ##
+set_from_resource $i3-wm.binding.take_next_free i3-wm.binding.take_next_free twosuperior
+bindsym $mod+$i3-wm.binding.take_next_free exec --no-startup-id /usr/bin/i3-next-workspace --move-window-and-follow
+
+## Modify // Move focused container to left/right screen // <> [4] [6] ##
+bindsym $mod+Mod2+KP_4 move container to output left;focus output left
+bindsym $mod+Mod2+KP_6 move container to output right;focus output right
+
+## Modify // Move current workspace to left/right screen // <> [7] [9] ##
+bindsym $mod+Mod2+KP_7 move workspace to output left
+bindsym $mod+Mod2+KP_9 move workspace to output right
+
+## Modify // Horizontal Window Orientation // <> h ##
+set_from_resource $i3-wm.binding.split_h i3-wm.binding.split_h h
+bindsym $mod+$i3-wm.binding.split_h split horizontal
+
+## Modify // Window Floating Toggle // <><Shift> Space ##
+set_from_resource $i3-wm.binding.float_toggle i3-wm.binding.float_toggle Shift+space
+bindsym $mod+$i3-wm.binding.float_toggle floating toggle
+
+## Modify // Move to Scratchpad // <><Shift> x ##
+set_from_resource $i3-wm.binding.move_scratchpad i3-wm.binding.move_scratchpad Shift+x
+bindsym $mod+$i3-wm.binding.move_scratchpad move to scratchpad
+
+## Modify // Tile/Float Focus Toggle // <> space ##
+set_from_resource $i3-wm.binding.focus_toggle i3-wm.binding.focus_toggle space
+bindsym $mod+$i3-wm.binding.focus_toggle focus mode_toggle
+
+## Modify // Window Layout: Stacked // <> s ##
+bindsym $mod+s layout stacked
+
+## Modify // Window Layout: Tabbed // <> z ##
+bindsym $mod+z layout tabbed
+
+## Modify // Window Layout: Splitted // <> e ##
+bindsym $mod+e layout toggle split
+
+
+###############################################################################
+# Session Management
+###############################################################################
+
+## Session // Exit App // <><Shift> a ##
+set_from_resource $i3-wm.binding.exit_app i3-wm.binding.exit_app Shift+a
+bindsym $mod+$i3-wm.binding.exit_app [con_id="__focused__"] kill
+
+## Session // Terminate App // <><Shift><Alt> a ##
+set_from_resource $i3-wm.binding.kill_app i3-wm.binding.kill_app Shift+a
+bindsym $mod+$alt+$i3-wm.binding.kill_app [con_id="__focused__"] exec --no-startup-id kill -9 $(xdotool getwindowfocus getwindowpid)
+
+## Session // Reload i3 Config // <> i ##
+set_from_resource $i3-wm.binding.reload i3-wm.binding.reload i
+bindsym $mod+$i3-wm.binding.reload reload
+
+## Session // Refresh Session // <><Shift> r ##
+set_from_resource $i3-wm.binding.refresh i3-wm.binding.refresh Shift+r
+set_from_resource $i3-wm.program.refresh_ui i3-wm.program.refresh_ui /usr/bin/regolith-look refresh
+bindsym $mod+$i3-wm.binding.refresh exec --no-startup-id $i3-wm.program.refresh_ui
+
+## Session // Restart i3 // <><Alt><Shift> r ##
+set_from_resource $i3-wm.binding.restart i3-wm.binding.restart Shift+r
+bindsym $mod+$alt+$i3-wm.binding.restart restart
+
+## Session // Sleep // <><Shift> s ##
+set_from_resource $i3-wm.binding.sleep i3-wm.binding.sleep Shift+s
+set_from_resource $i3-wm.program.sleep i3-wm.program.sleep systemctl suspend
+bindsym $mod+$i3-wm.binding.sleep exec $i3-wm.program.sleep
+
