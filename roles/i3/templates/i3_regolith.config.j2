@@ -45,20 +45,20 @@ bindsym $mod+$i3-wm.binding.sysnewfile exec --no-startup-id $sysnewfile
 # Load stylesheet if exists
 set_from_resource $ilia.stylesheet ilia.stylesheet
 
-## Launch // Application // <><Ctrl> l ##
-set_from_resource $i3-wm.binding.launcher.app i3-wm.binding.launcher.app Ctrl+l
+## Launch // Application // <><Ctrl> d ##
+set_from_resource $i3-wm.binding.launcher.app i3-wm.binding.launcher.app Ctrl+d
 set_from_resource $i3-wm.program.launcher.app i3-wm.program.launcher.app ilia -p apps
 bindsym $mod+$i3-wm.binding.launcher.app exec --no-startup-id $i3-wm.program.launcher.app -t $ilia.stylesheet
-
-## Launch // Command // <><Ctrl> Space ##
-set_from_resource $i3-wm.binding.launcher.cmd i3-wm.binding.launcher.cmd Ctrl+space
-set_from_resource $i3-wm.program.launcher.cmd i3-wm.program.launcher.cmd ilia -p terminal
-bindsym $mod+$i3-wm.binding.launcher.cmd exec --no-startup-id $i3-wm.program.launcher.cmd -t $ilia.stylesheet
 
 ## Launch // File Search // <><Ctrl> f ##
 set_from_resource $i3-wm.binding.file_search i3-wm.binding.file_search Ctrl+f
 set_from_resource $i3-wm.program.file_search i3-wm.program.file_search ilia -p tracker
 bindsym $mod+$i3-wm.binding.file_search exec --no-startup-id $i3-wm.program.file_search -t $ilia.stylesheet
+
+## Launch // Command // <> d ##
+set_from_resource $i3-wm.binding.launcher.cmd i3-wm.binding.launcher.cmd d
+set_from_resource $i3-wm.program.launcher.cmd i3-wm.program.launcher.cmd ilia -p terminal
+bindsym $mod+$i3-wm.binding.launcher.cmd exec --no-startup-id $i3-wm.program.launcher.cmd -t $ilia.stylesheet
 
 
 ###############################################################################
@@ -93,6 +93,11 @@ exec --no-startup-id i3-swap-focus
 bindsym $mod+Mod2+KP_1 focus output left
 bindsym $mod+Mod2+KP_3 focus output right
 
+## Navigate // Focus Firefox browser // <><Ctrl><Shift> b ##
+bindsym $mod+Ctrl+Shift+b [class="(?i)firefox"] focus
+
+## Navigate // Focus Terminal // <><Ctrl><Shift> t ##
+bindsym $mod+Ctrl+Shift+t [class="(?i).*term.*"] focus
 
 ###############################################################################
 # Window and Workspace Actions
@@ -109,6 +114,12 @@ bindsym $mod+Mod2+KP_6 move container to output right;focus output right
 ## Modify // Move current workspace to left/right screen // <> [7] [9] ##
 bindsym $mod+Mod2+KP_7 move workspace to output left
 bindsym $mod+Mod2+KP_9 move workspace to output right
+
+## Modify // Drag Firefox browser on WS // <><Ctrl><Alt> b ##
+bindsym $mod+Ctrl+$alt+b [class="(?i)firefox"] move workspace current
+
+## Modify // Drag Terminal on WS // <><Ctrl><Alt> t ##
+bindsym $mod+Ctrl+$alt+t [class="(?i)*.term.*"] move workspace current
 
 ## Modify // Horizontal Window Orientation // <> h ##
 set_from_resource $i3-wm.binding.split_h i3-wm.binding.split_h h
@@ -140,11 +151,24 @@ bindsym $mod+e layout toggle split
 # Session Management
 ###############################################################################
 
+## Session // Volume Up // <> * ##
+bindsym $mod+asterisk exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10%
+
+## Session // Volume Down // <> / ##
+bindsym $mod+slash exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10%
+
+## Session // Volume Mute toggle // <><Shift> * or / ##
+bindsym $mod+Shift+asterisk exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+bindsym $mod+Shift+slash exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+
 ## Session // Exit App // <><Shift> a ##
 set_from_resource $i3-wm.binding.exit_app i3-wm.binding.exit_app Shift+a
 bindsym $mod+$i3-wm.binding.exit_app [con_id="__focused__"] kill
 
-## Session // Terminate App // <><Shift><Alt> a ##
+## Session // Exit App clicking titlebar // <Mouse middle button on window titlebar> ##
+bindsym --release button2 kill
+
+## Session // Terminate App // <><Alt><Shift> a ##
 set_from_resource $i3-wm.binding.kill_app i3-wm.binding.kill_app Shift+a
 bindsym $mod+$alt+$i3-wm.binding.kill_app [con_id="__focused__"] exec --no-startup-id kill -9 $(xdotool getwindowfocus getwindowpid)
 
@@ -161,8 +185,13 @@ bindsym $mod+$i3-wm.binding.refresh exec --no-startup-id $i3-wm.program.refresh_
 set_from_resource $i3-wm.binding.restart i3-wm.binding.restart Shift+r
 bindsym $mod+$alt+$i3-wm.binding.restart restart
 
-## Session // Sleep // <><Shift> s ##
-set_from_resource $i3-wm.binding.sleep i3-wm.binding.sleep Shift+s
+## Session // Sleep // <><Shift> l ##
+set_from_resource $i3-wm.binding.sleep i3-wm.binding.sleep Shift+l
 set_from_resource $i3-wm.program.sleep i3-wm.program.sleep systemctl suspend
 bindsym $mod+$i3-wm.binding.sleep exec $i3-wm.program.sleep
+
+## Session // Power Down // <><Alt><Shift> l ##
+set_from_resource $i3-wm.binding.shutdown i3-wm.binding.shutdown Shift+l
+set_from_resource $i3-wm.program.shutdown i3-wm.program.shutdown /usr/bin/gnome-session-quit --power-off
+bindsym $mod+$alt+$i3-wm.binding.shutdown exec $i3-wm.program.shutdown
 
